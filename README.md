@@ -29,4 +29,5 @@ SysPulse is a lightweight, real-time command-line system monitoring utility buil
   git clone https://github.com/manvibisht/SysPulse-System-Monitor.git
 
  cd SysPulse-System-Monitor
+ Added disk space usage monitoring 
 
