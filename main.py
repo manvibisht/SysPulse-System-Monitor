@@ -7,9 +7,12 @@ app = FastAPI()
 
 @app.get("/api/stats")
 def get_stats():
+    # Fetch disk details for the primary drive (C:)
+    disk = psutil.disk_usage('/')
     return {
         "cpu_percent": psutil.cpu_percent(interval=None),
-        "ram_percent": psutil.virtual_memory().percent
+        "ram_percent": psutil.virtual_memory().percent,
+        "disk_percent": disk.percent
     }
 
 @app.get("/", response_class=HTMLResponse)
@@ -27,14 +30,22 @@ def read_root():
     </head>
     <body>
         <h1>SysPulse Web Dashboard</h1>
+        
         <div class="card">
             <h3>CPU Usage</h3>
             <div id="cpu" class="stat">0%</div>
         </div>
+        
         <div class="card">
             <h3>RAM Usage</h3>
             <div id="ram" class="stat">0%</div>
         </div>
+
+        <div class="card">
+            <h3>Disk Usage</h3>
+            <div id="disk" class="stat">0%</div>
+        </div>
+
         <script>
             async function update() {
                 try {
@@ -42,6 +53,7 @@ def read_root():
                     const data = await res.json();
                     document.getElementById('cpu').innerText = data.cpu_percent + '%';
                     document.getElementById('ram').innerText = data.ram_percent + '%';
+                    document.getElementById('disk').innerText = data.disk_percent + '%';
                 } catch(e) {
                     console.error(e);
                 }
@@ -54,5 +66,4 @@ def read_root():
     """
 
 if __name__ == "__main__":
-    # We use a single-process worker here to prevent experimental 3.14 multiprocessing crashes
     uvicorn.run(app, host="127.0.0.1", port=8000, workers=1)
